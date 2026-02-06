@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Desa Wiyugobak - Kobakma</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Condensed:wght@400;700&family=Oswald:wght@500;700&display=swap');
+
+        :root {
+            --rasta-red: #d90429;
+            --rasta-gold: #ffb703;
+            --rasta-green: #386641;
+            --rasta-black: #000000;
+        }
+
+        body {
+            font-family: 'Roboto Condensed', sans-serif;
+            background: linear-gradient(135deg, var(--rasta-red) 0%, #ffffff 50%, var(--rasta-black) 100%);
+            background-attachment: fixed;
+            min-height: 100vh;
+        }
+
+        .oswald { font-family: 'Oswald', sans-serif; }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .btn-rasta {
+            background-color: var(--rasta-red);
+            color: white;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            font-weight: bold;
+            letter-spacing: 1px;
+        }
+
+        .btn-rasta:hover {
+            filter: brightness(1.2);
+            transform: translateY(-2px);
+        }
+
+        @media print {
+            .no-print { display: none !important; }
+            .print-only { display: block !important; }
+            body { background: white !important; padding: 0 !important; }
+            .glass-card { border: 1px solid #000; box-shadow: none; border-radius: 0; }
+        }
+        .print-only { display: none; }
+
+        /* Login Box Styling */
+        #loginBox {
+            max-width: 350px;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+</head>
+<body class="p-4 md:p-8">
+
+    <!-- LOGIN PAGE -->
+    <div id="loginSection" class="flex items-center justify-center min-h-[80vh]">
+        <div id="loginBox" class="glass-card p-8 w-full">
+            <div class="text-center mb-6">
+                <div class="inline-block p-4 bg-red-600 rounded-full text-white mb-2 shadow-lg">
+                    <i class="fas fa-landmark fa-2x"></i>
+                </div>
+                <h1 class="oswald text-2xl font-bold text-gray-800 uppercase leading-none">Desa Wiyugobak</h1>
+                <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">Mamberamo Tengah - Kobakma</p>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-[10px] font-black text-gray-600 uppercase mb-1">Username</label>
+                    <input type="text" id="username" class="w-full p-3 border-b-2 border-red-600 bg-gray-50 outline-none font-bold" placeholder="admin">
+                </div>
+                <div>
+                    <label class="block text-[10px] font-black text-gray-600 uppercase mb-1">Password</label>
+                    <input type="password" id="password" class="w-full p-3 border-b-2 border-red-600 bg-gray-50 outline-none font-bold" placeholder="****">
+                </div>
+                <button onclick="handleLogin()" class="w-full btn-rasta py-4 rounded-lg shadow-xl mt-4">Login Sistem</button>
+                
+                <div class="text-center pt-4 border-t mt-4">
+                    <a href="https://kobakmanet.com" target="_blank" class="text-[10px] font-black text-blue-600 hover:underline">
+                        <i class="fas fa-globe mr-1"></i> AKSES KOBAKMANET.COM
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="mainApp" class="hidden max-w-7xl mx-auto">
+        <!-- HEADER -->
+        <header class="glass-card mb-6 p-4 flex flex-wrap justify-between items-center gap-4 no-print">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 bg-red-600 rounded-lg flex items-center justify-center text-white font-bold text-xl shadow-md">W</div>
+                <div>
+                    <h2 class="oswald font-bold text-xl leading-none">DESA WIYUGOBAK</h2>
+                    <p class="text-[10px] font-bold text-gray-500 uppercase">Provinsi Papua Pegunungan • Kab. Mamberamo Tengah • Distrik Kobakma</p>
+                </div>
+            </div>
+            
+            <nav class="flex flex-wrap gap-1 bg-gray-100 p-1 rounded-lg">
+                <button onclick="showPage('home')" class="px-4 py-2 font-bold text-xs uppercase hover:bg-white rounded transition-all">Beranda</button>
+                <button onclick="showPage('penduduk')" class="px-4 py-2 font-bold text-xs uppercase hover:bg-white rounded transition-all">Penduduk</button>
+                <button onclick="showPage('perangkat')" class="px-4 py-2 font-bold text-xs uppercase hover:bg-white rounded transition-all">Perangkat & LMD</button>
+                <button onclick="showPage('keuangan')" class="px-4 py-2 font-bold text-xs uppercase hover:bg-white rounded transition-all">Keuangan 2026</button>
+                <button onclick="logout()" class="px-4 py-2 font-bold text-xs uppercase text-red-600 hover:bg-red-50 rounded transition-all">Keluar</button>
+            </nav>
+        </header>
+
+        <!-- PAGE CONTENTS -->
+        <main>
+            <!-- BERANDA -->
+            <section id="homePage" class="space-y-6">
+                <div class="grid md:grid-cols-2 gap-6">
+                    <div class="glass-card p-8 border-l-8 border-red-600">
+                        <h3 class="oswald text-2xl font-bold text-red-600 mb-4 uppercase italic">Visi Desa</h3>
+                        <p class="text-lg font-bold text-gray-700 leading-relaxed italic">"Membangun Desa Wiyugobak yang berdaulat, mandiri, dan berbudaya melalui penguatan database digital dan transparansi anggaran di Distrik Kobakma."</p>
+                    </div>
+                    <div class="glass-card p-8 border-l-8 border-gray-800">
+                        <h3 class="oswald text-2xl font-bold text-gray-800 mb-4 uppercase italic">Misi Desa</h3>
+                        <ul class="space-y-3 font-bold text-gray-600 text-sm">
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-red-600"></i> Meningkatkan kualitas data kependudukan berbasis IT.</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-red-600"></i> Mewujudkan tata kelola keuangan desa yang transparan dan akuntabel.</li>
+                            <li class="flex items-center gap-2"><i class="fas fa-check text-red-600"></i> Mengoptimalkan peran LMD dalam pembangunan infrastruktur desa.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="glass-card p-6">
+                    <div class="flex justify-between items-center mb-4">
+                        <h3 class="oswald text-xl font-bold text-gray-800 uppercase italic">Dokumentasi & Kegiatan</h3>
+                        <button onclick="openModal('docModal')" class="bg-red-600 text-white px-4 py-2 rounded text-xs font-bold uppercase no-print">
+                            <i class="fas fa-plus mr-1"></i> Tambah Dokumentasi
+                        </button>
+                    </div>
+                    <div id="docGrid" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                        <!-- Content -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- PENDUDUK -->
+            <section id="pendudukPage" class="hidden glass-card p-6 overflow-hidden">
+                <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                    <div>
+                        <h3 class="oswald text-2xl font-bold text-red-600 uppercase italic">Database Penduduk</h3>
+                        <p class="text-xs text-gray-500 font-bold uppercase">Distrik Kobakma - Desa Wiyugobak</p>
+                    </div>
+                    <button onclick="openResidentModal()" class="btn-rasta px-6 py-3 rounded-lg shadow-lg">
+                        <i class="fas fa-user-plus mr-2"></i> Tambah Warga
+                    </button>
+                </div>
+                
+                <div class="overflow-x-auto rounded-lg border">
+                    <table class="w-full text-left">
+                        <thead class="bg-gray-800 text-white text-[10px] uppercase font-black">
+                            <tr>
+                                <th class="p-3 text-center">Foto</th>
+                                <th class="p-3">Nama Lengkap / NIK</th>
+                                <th class="p-3">Hubungan / Status</th>
+                                <th class="p-3">Orang Tua</th>
+                                <th class="p-3 text-center no-print">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="residentList" class="divide-y text-sm"></tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- PERANGKAT & LMD -->
+            <section id="perangkatPage" class="hidden space-y-8">
+                <div class="glass-card p-6">
+                    <div class="flex justify-between items-center mb-6 border-b pb-2">
+                        <h3 class="oswald text-2xl font-bold text-blue-700 uppercase italic">Perangkat Desa & LMD</h3>
+                        <button onclick="openStaffModal()" class="bg-blue-700 text-white px-5 py-2 rounded text-xs font-bold uppercase shadow">
+                            <i class="fas fa-id-badge mr-1"></i> Tambah Pengurus
+                        </button>
+                    </div>
+                    <div id="staffGrid" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <!-- Content -->
+                    </div>
+                </div>
+            </section>
+
+            <!-- KEUANGAN -->
+            <section id="keuanganPage" class="hidden glass-card p-6">
+                <div class="flex justify-between items-center mb-6 no-print">
+                    <h3 class="oswald text-2xl font-bold text-green-700 uppercase italic">Laporan Realisasi Dana Desa 2026</h3>
+                    <div class="flex gap-2">
+                        <button onclick="openModal('financeModal')" class="bg-green-700 text-white px-4 py-2 rounded text-xs font-bold uppercase shadow">Input Baru</button>
+                        <button onclick="window.print()" class="bg-gray-800 text-white px-4 py-2 rounded text-xs font-bold uppercase shadow">Cetak Laporan</button>
+                    </div>
+                </div>
+                
+                <div class="border-4 border-double border-gray-400 p-4">
+                    <div class="text-center mb-8">
+                        <h4 class="oswald text-2xl font-bold underline uppercase">LAPORAN KEUANGAN DESA WIYUGOBAK</h4>
+                        <p class="font-bold">TAHUN ANGGARAN: 2026</p>
+                    </div>
+                    <table class="w-full border-collapse border border-gray-400">
+                        <thead class="bg-gray-100 uppercase text-[10px] font-black">
+                            <tr>
+                                <th class="border border-gray-400 p-2 w-12">No</th>
+                                <th class="border border-gray-400 p-2 text-left">Nama Penerima / Kegiatan</th>
+                                <th class="border border-gray-400 p-2 text-right">Jumlah Realisasi (Rp)</th>
+                                <th class="border border-gray-400 p-2 text-center w-24">Tahun</th>
+                                <th class="border border-gray-400 p-2 no-print">Aksi</th>
+                            </tr>
+                        </thead>
+                        <tbody id="financeList" class="text-sm"></tbody>
+                        <tfoot class="bg-gray-800 text-white font-bold">
+                            <tr>
+                                <td colspan="2" class="p-3 text-right uppercase">Total Pengeluaran 2026:</td>
+                                <td id="totalFinance" class="p-3 text-right">Rp 0</td>
+                                <td colspan="2" class="no-print"></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Modal Penduduk -->
+    <div id="resModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-lg p-8">
+            <h3 id="resModalTitle" class="oswald text-xl font-bold text-red-600 uppercase mb-6 border-b pb-2">Input Data Penduduk</h3>
+            <form id="resForm" class="space-y-4">
+                <input type="hidden" id="editResId">
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div class="bg-gray-100 p-4 rounded-lg border-2 border-dashed border-gray-300 text-center">
+                        <label class="block text-[10px] font-black text-gray-500 uppercase mb-2">Foto Profil (Input PC)</label>
+                        <input type="file" id="resPhoto" accept="image/*" class="text-xs">
+                    </div>
+                    <div class="space-y-4">
+                        <input type="text" id="rName" placeholder="NAMA LENGKAP" class="w-full p-3 border-b-2 border-red-200 outline-none font-bold uppercase text-sm" required>
+                        <input type="text" id="rNik" placeholder="NIK (16 DIGIT)" class="w-full p-3 border-b-2 border-red-200 outline-none font-bold text-sm" required>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <select id="rStatus" class="w-full p-3 border-b-2 border-red-200 outline-none font-bold text-sm bg-white">
+                        <option>Kepala Keluarga</option>
+                        <option>Istri</option>
+                        <option>Anak</option>
+                        <option>Lainnya</option>
+                    </select>
+                    <input type="text" id="rAyah" placeholder="NAMA AYAH" class="w-full p-3 border-b-2 border-red-200 outline-none font-bold text-sm uppercase">
+                </div>
+                <input type="text" id="rIbu" placeholder="NAMA IBU" class="w-full p-3 border-b-2 border-red-200 outline-none font-bold text-sm uppercase">
+                
+                <div class="flex gap-2 pt-4">
+                    <button type="submit" class="flex-1 btn-rasta py-3 rounded-lg">Simpan Data</button>
+                    <button type="button" onclick="closeModal('resModal')" class="px-6 bg-gray-200 font-bold rounded-lg text-xs uppercase">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Staff -->
+    <div id="staffModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-lg p-8">
+            <h3 class="oswald text-xl font-bold text-blue-700 uppercase mb-6 border-b pb-2">Input Perangkat / LMD</h3>
+            <form id="staffForm" class="space-y-4">
+                <div class="bg-blue-50 p-4 rounded-lg border-2 border-dashed border-blue-200 text-center">
+                    <label class="block text-[10px] font-black text-blue-400 uppercase mb-2">Foto Profil (Input PC)</label>
+                    <input type="file" id="sPhoto" accept="image/*" class="text-xs">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="sName" placeholder="NAMA LENGKAP" class="p-3 border-b-2 border-blue-200 outline-none font-bold uppercase text-sm" required>
+                    <input type="text" id="sNik" placeholder="NIK" class="p-3 border-b-2 border-blue-200 outline-none font-bold text-sm">
+                </div>
+                <div class="grid grid-cols-2 gap-4">
+                    <input type="text" id="sRole" placeholder="JABATAN (Cth: Ketua LMD)" class="p-3 border-b-2 border-blue-200 outline-none font-bold text-sm" required>
+                    <input type="text" id="sEdu" placeholder="PENDIDIKAN TERAKHIR" class="p-3 border-b-2 border-blue-200 outline-none font-bold text-sm">
+                </div>
+                <div class="flex gap-2 pt-4">
+                    <button type="submit" class="flex-1 bg-blue-700 text-white font-bold py-3 rounded-lg uppercase">Simpan Pengurus</button>
+                    <button type="button" onclick="closeModal('staffModal')" class="px-6 bg-gray-200 font-bold rounded-lg text-xs uppercase">Batal</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Dokumentasi -->
+    <div id="docModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-sm p-6">
+            <h3 class="oswald text-xl font-bold text-gray-800 uppercase mb-4">Tambah Dokumentasi</h3>
+            <form id="docForm" class="space-y-4">
+                <input type="file" id="dPhoto" accept="image/*" class="text-xs w-full" required>
+                <input type="text" id="dName" placeholder="NAMA KEGIATAN" class="w-full p-3 border-b-2 outline-none font-bold text-sm uppercase" required>
+                <button type="submit" class="w-full btn-rasta py-3 rounded-lg">Upload Foto</button>
+                <button type="button" onclick="closeModal('docModal')" class="w-full text-xs font-bold uppercase text-gray-400">Tutup</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Modal Finance -->
+    <div id="financeModal" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-4">
+        <div class="glass-card w-full max-w-sm p-6">
+            <h3 class="oswald text-xl font-bold text-green-700 uppercase mb-4">Input Keuangan 2026</h3>
+            <form id="financeForm" class="space-y-4">
+                <input type="text" id="fName" placeholder="NAMA PENERIMA / KEGIATAN" class="w-full p-3 border-b-2 outline-none font-bold text-sm uppercase" required>
+                <input type="number" id="fAmount" placeholder="JUMLAH (RP)" class="w-full p-3 border-b-2 outline-none font-bold text-sm" required>
+                <button type="submit" class="w-full bg-green-700 text-white font-bold py-3 rounded-lg uppercase">Simpan Data</button>
+                <button type="button" onclick="closeModal('financeModal')" class="w-full text-xs font-bold uppercase text-gray-400">Tutup</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- PRINT SECTION (SURAT KETERANGAN) -->
+    <div id="printArea" class="print-only p-12 text-black bg-white">
+        <div class="flex items-center gap-6 border-b-4 border-black pb-4 mb-8">
+            <div class="w-24 h-24 bg-black flex items-center justify-center text-white text-4xl font-black">W</div>
+            <div class="text-center flex-1">
+                <h2 class="text-xl font-black uppercase">PEMERINTAH KABUPATEN MAMBERAMO TENGAH</h2>
+                <h3 class="text-lg font-bold uppercase">DISTRIK KOBAKMA - DESA WIYUGOBAK</h3>
+                <p class="text-[10px] italic">Alamat: Kantor Desa Wiyugobak, Kobakma - Papua Pegunungan | Website: kobakmanet.com</p>
+            </div>
+        </div>
+        
+        <div class="text-center mb-10">
+            <h4 class="text-2xl font-black underline uppercase">SURAT KETERANGAN PENDUDUK</h4>
+            <p class="font-bold">Nomor: 470 / <span id="pNo">000</span> / DESA-W / 2026</p>
+        </div>
+
+        <div class="space-y-6 text-xl leading-relaxed">
+            <p>Kepala Desa Wiyugobak menerangkan dengan sebenarnya bahwa:</p>
+            <table class="w-full ml-10">
+                <tr class="h-10"><td>Nama Lengkap</td><td>:</td><td class="font-black uppercase" id="pName"></td></tr>
+                <tr class="h-10"><td>NIK</td><td>:</td><td class="font-bold" id="pNik"></td></tr>
+                <tr class="h-10"><td>Hubungan Keluarga</td><td>:</td><td id="pStatus"></td></tr>
+                <tr class="h-10"><td>Nama Ayah</td><td>:</td><td id="pAyah"></td></tr>
+                <tr class="h-10"><td>Nama Ibu</td><td>:</td><td id="pIbu"></td></tr>
+            </table>
+            <p class="mt-6">Adalah benar penduduk Desa Wiyugobak, Distrik Kobakma yang berkelakuan baik. Demikian surat ini dikeluarkan untuk dapat dipergunakan sebagaimana mestinya.</p>
+        </div>
+
+        <div class="mt-32 flex justify-end">
+            <div class="text-center w-64">
+                <p>Wiyugobak, <span id="pDate"></span></p>
+                <p class="font-black mb-24">Kepala Desa Wiyugobak</p>
+                <p class="font-black underline uppercase">( ........................................ )</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // DATABASE WIYUGOBAK - INDEXEDDB
+        let db;
+        const stores = ['residents', 'staff', 'finance', 'docs'];
+
+        function initDB() {
+            return new Promise((resolve) => {
+                const request = indexedDB.open('WiyugobakDB', 1);
+                request.onupgradeneeded = (e) => {
+                    const dbInstance = e.target.result;
+                    stores.forEach(s => dbInstance.createObjectStore(s, { keyPath: 'id', autoIncrement: true }));
+                };
+                request.onsuccess = (e) => {
+                    db = e.target.result;
+                    resolve();
+                };
+            });
+        }
+
+        // DB UTILS
+        async function dbAdd(store, data) {
+            const tx = db.transaction(store, 'readwrite');
+            tx.objectStore(store).add(data);
+            return new Promise(res => tx.oncomplete = () => res());
+        }
+
+        async function dbPut(store, data) {
+            const tx = db.transaction(store, 'readwrite');
+            tx.objectStore(store).put(data);
+            return new Promise(res => tx.oncomplete = () => res());
+        }
+
+        async function dbDel(store, id) {
+            const tx = db.transaction(store, 'readwrite');
+            tx.objectStore(store).delete(Number(id));
+            return new Promise(res => tx.oncomplete = () => res());
+        }
+
+        async function dbGet(store) {
+            const tx = db.transaction(store, 'readonly');
+            const req = tx.objectStore(store).getAll();
+            return new Promise(res => req.onsuccess = () => res(req.result));
+        }
+
+        // AUTH
+        function handleLogin() {
+            const u = document.getElementById('username').value.toLowerCase();
+            const p = document.getElementById('password').value.toLowerCase();
+            if(u === 'admin' && p === 'admin') {
+                document.getElementById('loginSection').classList.add('hidden');
+                document.getElementById('mainApp').classList.remove('hidden');
+                initDB().then(() => renderAll());
+            } else {
+                alert('Username atau Password Salah!');
+            }
+        }
+
+        function logout() { location.reload(); }
+
+        // NAVIGATION
+        function showPage(id) {
+            ['homePage', 'pendudukPage', 'perangkatPage', 'keuanganPage'].forEach(p => {
+                document.getElementById(p).classList.add('hidden');
+            });
+            document.getElementById(id + 'Page').classList.remove('hidden');
+            window.scrollTo(0,0);
+        }
+
+        function openModal(id) { document.getElementById(id).classList.remove('hidden'); }
+        function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
+
+        // PHOTO CONVERTER
+        async function fileToBase64(file) {
+            if(!file) return null;
+            return new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(file);
+            });
+        }
+
+        // RENDERING LOGIC
+        async function renderAll() {
+            renderResidents();
+            renderStaff();
+            renderFinance();
+            renderDocs();
+        }
+
+        // RESIDENTS
+        async function renderResidents() {
+            const data = await dbGet('residents');
+            const list = document.getElementById('residentList');
+            list.innerHTML = data.map(r => `
+                <tr class="hover:bg-red-50">
+                    <td class="p-3 text-center">
+                        <img src="${r.photo || 'https://i.pravatar.cc/50'}" class="w-10 h-10 rounded-lg object-cover mx-auto border shadow-sm">
+                    </td>
+                    <td class="p-3">
+                        <div class="font-black text-gray-800 uppercase">${r.name}</div>
+                        <div class="text-[10px] font-bold text-red-600">${r.nik}</div>
+                    </td>
+                    <td class="p-3">
+                        <span class="bg-gray-100 text-gray-700 px-2 py-1 rounded text-[9px] font-black uppercase border">${r.status}</span>
+                    </td>
+                    <td class="p-3">
+                        <div class="text-[10px] font-bold text-gray-400">A: ${r.ayah || '-'}</div>
+                        <div class="text-[10px] font-bold text-gray-400">I: ${r.ibu || '-'}</div>
+                    </td>
+                    <td class="p-3 text-center no-print">
+                        <div class="flex justify-center gap-3">
+                            <button onclick="printSurat(${r.id})" class="text-blue-500 hover:scale-110"><i class="fas fa-print"></i></button>
+                            <button onclick="openResidentModal(${r.id})" class="text-orange-500 hover:scale-110"><i class="fas fa-edit"></i></button>
+                            <button onclick="handleDelete('residents', ${r.id})" class="text-red-500 hover:scale-110"><i class="fas fa-trash"></i></button>
+                        </div>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        async function openResidentModal(id = null) {
+            document.getElementById('resForm').reset();
+            document.getElementById('editResId').value = id || '';
+            document.getElementById('resModalTitle').innerText = id ? 'EDIT DATA WARGA' : 'TAMBAH WARGA BARU';
+            
+            if(id) {
+                const all = await dbGet('residents');
+                const r = all.find(x => x.id === id);
+                document.getElementById('rName').value = r.name;
+                document.getElementById('rNik').value = r.nik;
+                document.getElementById('rStatus').value = r.status;
+                document.getElementById('rAyah').value = r.ayah;
+                document.getElementById('rIbu').value = r.ibu;
+            }
+            openModal('resModal');
+        }
+
+        document.getElementById('resForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const id = document.getElementById('editResId').value;
+            const photoFile = document.getElementById('resPhoto').files[0];
+            const photoBase64 = await fileToBase64(photoFile);
+
+            const data = {
+                name: document.getElementById('rName').value,
+                nik: document.getElementById('rNik').value,
+                status: document.getElementById('rStatus').value,
+                ayah: document.getElementById('rAyah').value,
+                ibu: document.getElementById('rIbu').value
+            };
+
+            if(photoBase64) data.photo = photoBase64;
+
+            if(id) {
+                const oldData = await dbGet('residents');
+                const found = oldData.find(x => x.id === Number(id));
+                data.id = Number(id);
+                if(!photoBase64) data.photo = found.photo;
+                await dbPut('residents', data);
+            } else {
+                await dbAdd('residents', data);
+            }
+            
+            closeModal('resModal');
+            renderResidents();
+        };
+
+        // STAFF
+        async function renderStaff() {
+            const data = await dbGet('staff');
+            const grid = document.getElementById('staffGrid');
+            grid.innerHTML = data.map(s => `
+                <div class="glass-card p-6 flex flex-col items-center text-center relative group">
+                    <button onclick="handleDelete('staff', ${s.id})" class="absolute top-4 right-4 text-gray-300 hover:text-red-500 no-print transition-colors">
+                        <i class="fas fa-times-circle"></i>
+                    </button>
+                    <img src="${s.photo || 'https://i.pravatar.cc/100'}" class="w-24 h-24 rounded-2xl object-cover mb-4 border-4 border-white shadow-lg">
+                    <h5 class="oswald font-bold text-gray-800 uppercase leading-none mb-1">${s.name}</h5>
+                    <p class="text-[10px] text-blue-700 font-black tracking-widest uppercase mb-3">${s.role}</p>
+                    <div class="w-full bg-blue-50 p-2 rounded text-[9px] font-bold text-gray-500 grid grid-cols-2 gap-2">
+                        <span>NIK: ${s.nik || '-'}</span>
+                        <span>PEND: ${s.edu || '-'}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function openStaffModal() {
+            document.getElementById('staffForm').reset();
+            openModal('staffModal');
+        }
+
+        document.getElementById('staffForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const photo = await fileToBase64(document.getElementById('sPhoto').files[0]);
+            const data = {
+                name: document.getElementById('sName').value,
+                nik: document.getElementById('sNik').value,
+                role: document.getElementById('sRole').value,
+                edu: document.getElementById('sEdu').value,
+                photo: photo
+            };
+            await dbAdd('staff', data);
+            closeModal('staffModal');
+            renderStaff();
+        };
+
+        // FINANCE
+        async function renderFinance() {
+            const data = await dbGet('finance');
+            const list = document.getElementById('financeList');
+            let total = 0;
+            list.innerHTML = data.map((f, i) => {
+                total += Number(f.amount);
+                return `
+                <tr class="hover:bg-green-50">
+                    <td class="border p-2 text-center font-bold text-gray-400">${i+1}</td>
+                    <td class="border p-2 font-black text-gray-700 uppercase">${f.name}</td>
+                    <td class="border p-2 text-right font-black text-red-600">Rp ${Number(f.amount).toLocaleString('id-ID')}</td>
+                    <td class="border p-2 text-center font-bold text-gray-500">2026</td>
+                    <td class="border p-2 text-center no-print">
+                        <button onclick="handleDelete('finance', ${f.id})" class="text-red-500 hover:scale-110"><i class="fas fa-trash-alt"></i></button>
+                    </td>
+                </tr>
+            `}).join('');
+            document.getElementById('totalFinance').innerText = 'Rp ' + total.toLocaleString('id-ID');
+        }
+
+        document.getElementById('financeForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const data = {
+                name: document.getElementById('fName').value,
+                amount: document.getElementById('fAmount').value,
+                year: 2026
+            };
+            await dbAdd('finance', data);
+            closeModal('financeModal');
+            renderFinance();
+        };
+
+        // DOCS
+        async function renderDocs() {
+            const data = await dbGet('docs');
+            const grid = document.getElementById('docGrid');
+            grid.innerHTML = data.map(d => `
+                <div class="relative group rounded-xl overflow-hidden shadow-md">
+                    <img src="${d.photo}" class="w-full h-32 object-cover">
+                    <div class="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center p-2 text-center">
+                        <p class="text-white text-[9px] font-black uppercase mb-2">${d.name}</p>
+                        <button onclick="handleDelete('docs', ${d.id})" class="text-red-400 text-xs"><i class="fas fa-trash-alt"></i></button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        document.getElementById('docForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const photo = await fileToBase64(document.getElementById('dPhoto').files[0]);
+            await dbAdd('docs', { name: document.getElementById('dName').value, photo: photo });
+            closeModal('docModal');
+            renderDocs();
+        };
+
+        // UTILS
+        async function handleDelete(store, id) {
+            if(confirm('Hapus data ini secara permanen?')) {
+                await dbDel(store, id);
+                renderAll();
+            }
+        }
+
+        async function printSurat(id) {
+            const all = await dbGet('residents');
+            const r = all.find(x => x.id === id);
+            document.getElementById('pName').innerText = r.name;
+            document.getElementById('pNik').innerText = r.nik;
+            document.getElementById('pStatus').innerText = r.status;
+            document.getElementById('pAyah').innerText = r.ayah;
+            document.getElementById('pIbu').innerText = r.ibu;
+            document.getElementById('pNo').innerText = Math.floor(100 + Math.random() * 900);
+            document.getElementById('pDate').innerText = new Date().toLocaleDateString('id-ID', {day:'numeric', month:'long', year:'numeric'});
+            window.print();
+        }
+    </script>
+</body>
+</html>
